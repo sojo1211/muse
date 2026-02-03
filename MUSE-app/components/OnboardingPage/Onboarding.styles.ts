@@ -2,130 +2,52 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// =========================
-// 📐 Figma 기준 (iPhone 14/15)
-// =========================
-const FIGMA_WIDTH = 393;
-const FIGMA_HEIGHT = 852;
+// 📱 반응형 기준점 (iPhone 14/15 기준)
+const DESIGN_WIDTH = 393;
 
-// =========================
-// 📏 Scale 함수
-// =========================
-export const scale = (size: number) =>
-  (SCREEN_WIDTH / FIGMA_WIDTH) * size;
+/**
+ * 📏 제한 없는 반응형 사이즈 계산
+ * 기기 너비(SCREEN_WIDTH)가 커지는 만큼 요소도 100% 비례해서 커집니다.
+ * 아이패드에서도 폰 화면의 비율을 그대로 유지합니다.
+ */
+const getResponsiveSize = (size: number) => {
+  const scale = SCREEN_WIDTH / DESIGN_WIDTH;
+  return size * scale; 
+};
 
-export const verticalScale = (size: number) =>
-  (SCREEN_HEIGHT / FIGMA_HEIGHT) * size;
-
-// =========================
-// 📱 레이아웃 상수
-// =========================
-const isTablet = SCREEN_WIDTH >= 768;
-export const MAX_CONTENT_WIDTH = 430;
-
-export const NY_IMAGE_WIDTH = scale(150);
-export const NY_IMAGE_HEIGHT = scale(348);
-
-// =========================
-// 🎨 Styles
-// =========================
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    alignItems: 'center',
   },
 
   contentWrapper: {
-    flex: 1,
-    width: '100%',
-    maxWidth: MAX_CONTENT_WIDTH,
-    alignItems: 'center',
+    flex: 1, 
+    justifyContent: 'center', // 세로 중앙
+    alignItems: 'center',     // 가로 중앙
     position: 'relative',
   },
 
-  // =========================
-  // 🔷 로고 그룹
-  // =========================
+  // 🔷 로고 그룹: 이제 리본과 똑같이 제한 없이 커집니다.
   logoGroup: {
-    position: 'absolute',
-    top: SCREEN_HEIGHT * 0.305,
-    alignSelf: 'center',
-    width: Math.min(scale(198.33), 240),
-    height: Math.min(scale(155.75), 190),
+    position: 'absolute', 
+    zIndex: 10,
+    width: getResponsiveSize(198.33),
+    height: getResponsiveSize(155.75),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  // =========================
-  // 🚩 국기
-  // =========================
-  flagIcon: {
-    position: 'absolute',
-    left: '50%',
-    top: 0,
-    marginLeft: scale(100) - scale(198.33) / 2,
-    width: Math.min(scale(77.33), 90),
-    height: Math.min(scale(77.33), 90),
-    resizeMode: 'contain',
-    transform: [{ rotate: '20.56deg' }],
-    zIndex: 2,
-  },
-
-  // =========================
-  // 🏷 메인 로고
-  // =========================
   mainLogo: {
-    marginTop: verticalScale(64),
-    width: Math.min(scale(180), 220),
-    height: Math.min(verticalScale(92), 110),
-    resizeMode: 'contain',
+    width: '100%',
+    height: '100%',
   },
 
-  // =========================
-// =========================
-  // 🎀 리본 (반응형 보정)
-  // =========================
+  // 🎀 리본: 화면 너비 비율에 맞춰 끝까지 확장됩니다.
   ribbon: {
     position: 'absolute',
-    
-    // 1. 세로 위치: Figma 기준 verticalScale 사용
-    top: verticalScale(130), 
-    
-    // 2. 가로 위치: 절대값(left) 대신 중앙 정렬 로직 사용
-    // 아이패드/안드로이드 모든 기종에서 중앙을 유지합니다.
-    alignSelf: 'center', 
-    
-    // 만약 중앙에서 약간 옆으로 비껴나야 한다면 
-    // marginLeft: scale(偏移값)을 추가해 미세조정 하세요.
-    
-    // 3. 크기 반응형
-    width: scale(505),
-    height: scale(401),
-    
-    resizeMode: 'contain',
-    zIndex: 3,
-  },
-
-  // =========================
-  // 🗽 랜드마크 이미지
-  // =========================
-  bottomImage: {
-    width: NY_IMAGE_WIDTH,
-    height: NY_IMAGE_HEIGHT,
-    maxWidth: 200,
-    maxHeight: 450,
-    resizeMode: 'contain',
-    position: 'absolute',
-    bottom: 0,
-  },
-
-  // =========================
-  // 🌊 마스크 영역
-  // =========================
-  bottomImageMask: {
-    position: 'absolute',
-    left: isTablet ? -((SCREEN_WIDTH - MAX_CONTENT_WIDTH) / 2) : 0,
-    bottom: 0,
-    width: NY_IMAGE_WIDTH,
-    overflow: 'hidden',
+    zIndex: 1,
+    width: getResponsiveSize(505),
+    height: getResponsiveSize(401),
   },
 });

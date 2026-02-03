@@ -1,73 +1,33 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Image, View } from 'react-native';
-import { NY_IMAGE_HEIGHT, styles } from './Onboarding.styles';
+import React from 'react';
+import { Image, StatusBar, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { styles } from './Onboarding.styles';
 
 export default function OnboardingScreen() {
-  // 🎀 리본 애니메이션 (처음엔 안 보임)
-  const ribbonOpacity = useRef(new Animated.Value(0)).current;
-
-  // 🗽 NY 랜드마크 애니메이션 (처음엔 높이 0)
-  const fillAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // 순차적 실행: 리본 등장 -> 랜드마크 상승
-    Animated.sequence([
-      // 1️⃣ 리본 페이드인 (애니메이션 시작과 동시에 실행)
-      Animated.timing(ribbonOpacity, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      // 2️⃣ 리본 등장 완료 후 즉시 랜드마크 상승
-      Animated.timing(fillAnim, {
-        toValue: NY_IMAGE_HEIGHT,
-        duration: 1500,
-        useNativeDriver: false, // 레이아웃 변경은 false
-      }),
-    ]).start();
-  }, []);
-
   return (
-    <View style={styles.container}>
-      <View style={styles.contentWrapper}>
+    <SafeAreaProvider>
+      {/* edges={['bottom']}를 주어 상단 영역(상태바)은 제외하고 그 아래부터 레이아웃 시작 */}
+      <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" />
         
-        {/* 🔷 로고 그룹: 별도 애니메이션 없이 처음부터 고정 */}
-        <View style={styles.logoGroup}>
+        <View style={styles.contentWrapper}>
+          {/* 🎀 리본: 배경 (로고와 같은 중앙축 공유) */}
           <Image
-            source={require('../../assets/images/Onboarding/USA.png')}
-            style={styles.flagIcon}
-          />
-          <Image
-            source={require('../../assets/images/LOGO.png')}
-            style={styles.mainLogo}
-          />
-        </View>
-
-        {/* 🎀 리본: opacity 애니메이션 적용 */}
-        <Animated.Image
-          source={require('../../assets/images/Onboarding/ribbon.png')}
-          style={[
-            styles.ribbon,
-            { opacity: ribbonOpacity },
-          ]}
-          resizeMode="contain"
-        />
-
-        {/* 🗽 NY 랜드마크: height(mask) 애니메이션 적용 */}
-        <Animated.View
-          style={[
-            styles.bottomImageMask,
-            { height: fillAnim },
-          ]}
-        >
-          <Image
-            source={require('../../assets/images/Onboarding/NY.png')}
-            style={styles.bottomImage}
+            source={require('../../assets/images/Onboarding/ribbon.png')}
+            style={styles.ribbon}
             resizeMode="contain"
           />
-        </Animated.View>
 
-      </View>
-    </View>
+          {/* 🔷 로고: 정중앙 (Safe Area를 제외한 영역의 0,0) */}
+          <View style={styles.logoGroup}>
+            <Image
+              source={require('../../assets/images/LOGO.png')}
+              style={styles.mainLogo}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
