@@ -7,11 +7,12 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import SearchScreen from '../SearchPage/SearchScreen';
+import MyScreen from '../MyPage/MyScreen';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -120,41 +121,56 @@ function CardGrid({ data }: { data: { title: string; venue: string }[] }) {
 
 // ── 섹션 컴포넌트 ─────────────────────────────────────────────
 
-function Header() {
-  return (
-    <View style={st.header}>
-      <Image
-        source={require('../../assets/images/Home/LOGO_black.png')}
-        style={[st.headerLogo, { tintColor: '#FFB3B3' }]}
-        resizeMode="contain"
-      />
-      <TouchableOpacity hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-        <Image
-          source={require('../../assets/images/Home/shoppingcart.png')}
-          style={st.cartIcon}
-          resizeMode="contain"
-        />
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-function SearchBar() {
-  return (
-    <View style={st.searchWrap}>
-      <View style={st.searchBox}>
-        <Image
-          source={require('../../assets/images/Home/research.png')}
-          style={st.searchIcon}
-          resizeMode="contain"
-        />
-        <TextInput
-          style={st.searchInput}
-          placeholder="영감이 머무는곳, 뮤즈"
-          placeholderTextColor="#BDB3B3"
-        />
+function StickyHeader({ isScrolled, onSearchPress }: { isScrolled: boolean; onSearchPress: () => void }) {
+  if (isScrolled) {
+    return (
+      <View style={st.stickyCompact}>
+        <TouchableOpacity style={[st.searchBox, { flex: 1 }]} onPress={onSearchPress} activeOpacity={0.8}>
+          <Image
+            source={require('../../assets/images/Home/research.png')}
+            style={st.searchIcon}
+            resizeMode="contain"
+          />
+          <Text style={st.searchPlaceholder}>당신의 뮤즈를 만나세요</Text>
+        </TouchableOpacity>
+        <TouchableOpacity hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Image
+            source={require('../../assets/images/Home/shoppingcart.png')}
+            style={st.cartIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
-    </View>
+    );
+  }
+
+  return (
+    <>
+      <View style={st.header}>
+        <Image
+          source={require('../../assets/images/Home/LOGO_black.png')}
+          style={[st.headerLogo, { tintColor: '#FFB3B3' }]}
+          resizeMode="contain"
+        />
+        <TouchableOpacity hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Image
+            source={require('../../assets/images/Home/shoppingcart.png')}
+            style={st.cartIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={st.searchWrap}>
+        <TouchableOpacity style={st.searchBox} onPress={onSearchPress} activeOpacity={0.8}>
+          <Image
+            source={require('../../assets/images/Home/research.png')}
+            style={st.searchIcon}
+            resizeMode="contain"
+          />
+          <Text style={st.searchPlaceholder}>당신의 뮤즈를 만나세요</Text>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 }
 
@@ -375,17 +391,48 @@ function BottomNav({ active, onChange }: { active: number; onChange: (i: number)
 
 export default function MainScreen() {
   const [activeNav, setActiveNav] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+
+  // 검색 탭: SearchScreen으로 전환
+  if (activeNav === 1) {
+    return (
+      <SearchScreen
+        onBack={() => setActiveNav(0)}
+        activeNav={activeNav}
+        onNavChange={setActiveNav}
+      />
+    );
+  }
+
+  // 마이 탭: MyScreen으로 전환
+  if (activeNav === 3) {
+    return (
+      <MyScreen
+        onBack={() => setActiveNav(0)}
+        activeNav={activeNav}
+        onNavChange={setActiveNav}
+      />
+    );
+  }
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={st.root} edges={['top', 'left', 'right']}>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-        <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} overScrollMode="never" bounces={false}>
+        {/* ── 상단 고정 헤더 ── */}
+        <StickyHeader isScrolled={isScrolled} onSearchPress={() => setActiveNav(1)} />
+
+        <ScrollView
+          ref={scrollRef}
+          showsVerticalScrollIndicator={false}
+          overScrollMode="never"
+          bounces={false}
+          onScroll={(e) => setIsScrolled(e.nativeEvent.contentOffset.y > 10)}
+          scrollEventThrottle={16}
+        >
           {/* ↓ 섹션 넣다 뺄 때 이 줄만 추가/삭제 */}
-          <Header />
-          <SearchBar />
           <TopBanner />
           <MenuGrid />
           <BannerCarousel />
@@ -417,17 +464,18 @@ const st = StyleSheet.create({
   headerLogo: { width: s(68), height: s(28) },
   cartIcon: { width: s(24), height: s(24) },
 
-  searchWrap: { paddingHorizontal: s(13), marginBottom: s(12) },
+  searchWrap: { paddingLeft: s(34), paddingRight: s(13), marginBottom: s(12), backgroundColor: '#fff' },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(8),
-    backgroundColor: '#F2F2F2',
+    backgroundColor: '#D9D9D9',
     borderRadius: s(12),
     paddingHorizontal: s(14),
     height: s(39),
+    width: s(340),
   },
-  searchIcon: { width: s(16), height: s(16), opacity: 0.5 },
+  searchIcon: { width: s(18), height: s(18) },
   searchInput: {
     flex: 1,
     fontSize: s(13),
@@ -564,5 +612,22 @@ const st = StyleSheet.create({
   androidBottomFill: {
     width: '100%',
     backgroundColor: '#000',
+  },
+
+  searchPlaceholder: {
+    flex: 1,
+    fontSize: s(13),
+    color: '#BDB3B3',
+    fontFamily: 'Inter_400Regular',
+  },
+
+  // 스크롤 시 압축 헤더
+  stickyCompact: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s(10),
+    paddingHorizontal: s(13),
+    paddingVertical: s(8),
+    backgroundColor: '#fff',
   },
 });
