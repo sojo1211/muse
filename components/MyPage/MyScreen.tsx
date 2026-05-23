@@ -48,9 +48,9 @@ function ProfileBanner() {
   );
 }
 
-function LoginButton() {
+function LoginButton({ onPress }: { onPress: () => void }) {
   return (
-    <TouchableOpacity style={ms.loginBtn} activeOpacity={0.7}>
+    <TouchableOpacity style={ms.loginBtn} onPress={onPress} activeOpacity={0.7}>
       <Text style={ms.loginTxt}>로그인하기</Text>
     </TouchableOpacity>
   );
@@ -101,11 +101,12 @@ function BottomNav({ active, onChange }: { active: number; onChange: (i: number)
 
 interface MyScreenProps {
   onBack: () => void;
+  onLoginPress: () => void;
   activeNav: number;
   onNavChange: (i: number) => void;
 }
 
-export default function MyScreen({ onBack, activeNav, onNavChange }: MyScreenProps) {
+export default function MyScreen({ onBack, onLoginPress, activeNav, onNavChange }: MyScreenProps) {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={ms.root} edges={['top', 'left', 'right']}>
@@ -117,7 +118,7 @@ export default function MyScreen({ onBack, activeNav, onNavChange }: MyScreenPro
           contentContainerStyle={ms.scrollContent}
         >
           <ProfileBanner />
-          <LoginButton />
+          <LoginButton onPress={onLoginPress} />
           <MenuList />
         </ScrollView>
         <BottomNav active={activeNav} onChange={onNavChange} />

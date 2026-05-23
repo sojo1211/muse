@@ -13,6 +13,10 @@ import {
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import SearchScreen from '../SearchPage/SearchScreen';
 import MyScreen from '../MyPage/MyScreen';
+import LoginScreen from '../LoginPage/LoginScreen';
+import ResetPasswordScreen from '../ResetPasswordPage/ResetPasswordScreen';
+import FindIdScreen from '../FindIdPage/FindIdScreen';
+import SignupScreen from '../SignupPage/SignupScreen';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -392,7 +396,31 @@ function BottomNav({ active, onChange }: { active: number; onChange: (i: number)
 export default function MainScreen() {
   const [activeNav, setActiveNav] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [showFindId, setShowFindId] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+
+  if (showReset) {
+    return <ResetPasswordScreen onBack={() => setShowReset(false)} />;
+  }
+  if (showFindId) {
+    return <FindIdScreen onBack={() => setShowFindId(false)} />;
+  }
+  if (showSignup) {
+    return <SignupScreen onBack={() => setShowSignup(false)} />;
+  }
+
+  // 로그인 화면
+  if (showLogin) {
+    return <LoginScreen
+      onBack={() => setShowLogin(false)}
+      onResetPress={() => { setShowLogin(false); setShowReset(true); }}
+      onFindIdPress={() => { setShowLogin(false); setShowFindId(true); }}
+      onSignupPress={() => { setShowLogin(false); setShowSignup(true); }}
+    />;
+  }
 
   // 검색 탭: SearchScreen으로 전환
   if (activeNav === 1) {
@@ -410,6 +438,7 @@ export default function MainScreen() {
     return (
       <MyScreen
         onBack={() => setActiveNav(0)}
+        onLoginPress={() => setShowLogin(true)}
         activeNav={activeNav}
         onNavChange={setActiveNav}
       />
@@ -464,7 +493,7 @@ const st = StyleSheet.create({
   headerLogo: { width: s(68), height: s(28) },
   cartIcon: { width: s(24), height: s(24) },
 
-  searchWrap: { paddingLeft: s(34), paddingRight: s(13), marginBottom: s(12), backgroundColor: '#fff' },
+  searchWrap: { paddingLeft: s(13), paddingRight: s(13), marginBottom: s(12), backgroundColor: '#fff' },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -473,7 +502,6 @@ const st = StyleSheet.create({
     borderRadius: s(12),
     paddingHorizontal: s(14),
     height: s(39),
-    width: s(340),
   },
   searchIcon: { width: s(18), height: s(18) },
   searchInput: {
