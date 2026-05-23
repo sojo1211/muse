@@ -11,7 +11,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import AndroidBottomFill from '../common/AndroidBottomFill';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -119,6 +120,10 @@ export default function SignupScreen({ onBack }: SignupScreenProps) {
   const [agreeMarketing, setAgreeMarketing] = useState(false);
   const [agreeSms, setAgreeSms] = useState(false);
 
+  const insets = useSafeAreaInsets();
+  const isAndroid = Platform.OS === 'android';
+  const bottomPad = isAndroid ? s(40) : insets.bottom + s(40);
+
   function toggleAll() {
     const next = !agreeAll;
     setAgreeAll(next);
@@ -130,8 +135,7 @@ export default function SignupScreen({ onBack }: SignupScreenProps) {
   }
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={ss.root} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={ss.root} edges={['top', 'left', 'right']}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <Header onBack={onBack} />
           <ScrollView
@@ -139,7 +143,7 @@ export default function SignupScreen({ onBack }: SignupScreenProps) {
             overScrollMode="never"
             bounces={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={ss.scrollContent}
+            contentContainerStyle={[ss.scrollContent, { paddingBottom: bottomPad }]}
           >
             {/* 본인인증하기 */}
             <SectionTitle label="본인인증하기" />
@@ -211,8 +215,8 @@ export default function SignupScreen({ onBack }: SignupScreenProps) {
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
+        <AndroidBottomFill />
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 

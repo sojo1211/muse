@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import AndroidBottomFill from '../common/AndroidBottomFill';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -81,7 +82,6 @@ const NAV_TABS = [
 function BottomNav({ active, onChange }: { active: number; onChange: (i: number) => void }) {
   const insets = useSafeAreaInsets();
   const isAndroid = Platform.OS === 'android';
-  const androidFillHeight = isAndroid ? Math.max(insets.bottom, s(20)) : 0;
   return (
     <View>
       <View style={[ms.navbar, { paddingBottom: isAndroid ? s(8) : insets.bottom || s(20) }]}>
@@ -92,7 +92,7 @@ function BottomNav({ active, onChange }: { active: number; onChange: (i: number)
           </TouchableOpacity>
         ))}
       </View>
-      {isAndroid && <View style={[ms.androidBottomFill, { height: androidFillHeight }]} />}
+      <AndroidBottomFill />
     </View>
   );
 }
@@ -108,8 +108,7 @@ interface MyScreenProps {
 
 export default function MyScreen({ onBack, onLoginPress, activeNav, onNavChange }: MyScreenProps) {
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={ms.root} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={ms.root} edges={['top', 'left', 'right']}>
         <MyHeader onBack={onBack} />
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -123,7 +122,6 @@ export default function MyScreen({ onBack, onLoginPress, activeNav, onNavChange 
         </ScrollView>
         <BottomNav active={activeNav} onChange={onNavChange} />
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 

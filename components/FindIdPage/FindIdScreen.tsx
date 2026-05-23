@@ -11,7 +11,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import AndroidBottomFill from '../common/AndroidBottomFill';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -84,10 +85,12 @@ export default function FindIdScreen({ onBack }: FindIdScreenProps) {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [foundEmail] = useState('');
+  const insets = useSafeAreaInsets();
+  const isAndroid = Platform.OS === 'android';
+  const bottomPad = isAndroid ? s(40) : insets.bottom + s(40);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={fs.root} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={fs.root} edges={['top', 'left', 'right']}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -98,7 +101,7 @@ export default function FindIdScreen({ onBack }: FindIdScreenProps) {
             overScrollMode="never"
             bounces={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={fs.scrollContent}
+            contentContainerStyle={[fs.scrollContent, { paddingBottom: bottomPad }]}
           >
             {/* 본인인증하기 */}
             <Text style={fs.sectionTitle}>본인인증하기</Text>
@@ -132,8 +135,8 @@ export default function FindIdScreen({ onBack }: FindIdScreenProps) {
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
+        <AndroidBottomFill />
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 

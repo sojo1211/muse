@@ -1,13 +1,12 @@
 import React from 'react';
 import { Image, StatusBar, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AnimatedRibbon from './AnimatedRibbon';
 import { styles } from './Onboarding.styles';
 
 export default function OnboardingScreen() {
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
         <StatusBar barStyle="dark-content" />
 
         <View style={styles.contentWrapper}>
@@ -24,6 +23,5 @@ export default function OnboardingScreen() {
           </View>
         </View>
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }

@@ -9,8 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Platform } from 'react-native';
+import AndroidBottomFill from '../common/AndroidBottomFill';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -134,7 +135,6 @@ const NAV_TABS = [
 function BottomNav({ active, onChange }: { active: number; onChange: (i: number) => void }) {
   const insets = useSafeAreaInsets();
   const isAndroid = Platform.OS === 'android';
-  const androidFillHeight = isAndroid ? Math.max(insets.bottom, s(20)) : 0;
   return (
     <View>
       <View style={[ss.navbar, { paddingBottom: isAndroid ? s(8) : insets.bottom || s(20) }]}>
@@ -145,7 +145,7 @@ function BottomNav({ active, onChange }: { active: number; onChange: (i: number)
           </TouchableOpacity>
         ))}
       </View>
-      {isAndroid && <View style={[ss.androidBottomFill, { height: androidFillHeight }]} />}
+      <AndroidBottomFill />
     </View>
   );
 }
@@ -160,8 +160,7 @@ interface SearchScreenProps {
 
 export default function SearchScreen({ onBack, activeNav, onNavChange }: SearchScreenProps) {
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={ss.root} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={ss.root} edges={['top', 'left', 'right']}>
         <SearchHeader onBack={onBack} />
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -173,7 +172,6 @@ export default function SearchScreen({ onBack, activeNav, onNavChange }: SearchS
         </ScrollView>
         <BottomNav active={activeNav} onChange={onNavChange} />
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 

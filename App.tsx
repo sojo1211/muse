@@ -7,6 +7,7 @@ import {
     useFonts
 } from '@expo-google-fonts/inter';
 import React, { useEffect, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import MainScreen from './components/MainPage/MainScreen';
 import OnboardingScreen from './components/OnboardingPage/OnboardingScreen';
@@ -30,7 +31,9 @@ export default function App() {
 
   if (!fontsLoaded) return null;
 
-  if (showOnboarding) return <OnboardingScreen />;
-
-  return <MainScreen />;
+  return (
+    <SafeAreaProvider>
+      {showOnboarding ? <OnboardingScreen /> : <MainScreen />}
+    </SafeAreaProvider>
+  );
 }

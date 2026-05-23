@@ -11,7 +11,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import AndroidBottomFill from '../common/AndroidBottomFill';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -139,6 +140,9 @@ export default function ResetPasswordScreen({ onBack }: ResetPasswordScreenProps
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
   const [confirmError, setConfirmError] = useState('');
+  const insets = useSafeAreaInsets();
+  const isAndroid = Platform.OS === 'android';
+  const bottomPad = isAndroid ? s(40) : insets.bottom + s(40);
 
   function handleComplete() {
     if (newPw !== confirmPw) {
@@ -149,8 +153,7 @@ export default function ResetPasswordScreen({ onBack }: ResetPasswordScreenProps
   }
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={rs.root} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={rs.root} edges={['top', 'left', 'right']}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -161,7 +164,7 @@ export default function ResetPasswordScreen({ onBack }: ResetPasswordScreenProps
             overScrollMode="never"
             bounces={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={rs.scrollContent}
+            contentContainerStyle={[rs.scrollContent, { paddingBottom: bottomPad }]}
           >
             {/* 본인인증하기 */}
             <SectionTitle label="본인인증하기" />
@@ -192,8 +195,8 @@ export default function ResetPasswordScreen({ onBack }: ResetPasswordScreenProps
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
+        <AndroidBottomFill />
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 

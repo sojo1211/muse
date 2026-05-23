@@ -11,7 +11,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import AndroidBottomFill from '../common/AndroidBottomFill';
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -113,10 +114,12 @@ interface LoginScreenProps {
 export default function LoginScreen({ onBack, onResetPress, onFindIdPress, onSignupPress }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const insets = useSafeAreaInsets();
+  const isAndroid = Platform.OS === 'android';
+  const bottomPad = isAndroid ? s(40) : insets.bottom + s(40);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={ls.root} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={ls.root} edges={['top', 'left', 'right']}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -126,7 +129,7 @@ export default function LoginScreen({ onBack, onResetPress, onFindIdPress, onSig
             overScrollMode="never"
             bounces={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={ls.scrollContent}
+            contentContainerStyle={[ls.scrollContent, { paddingBottom: bottomPad }]}
           >
             {/* 뒤로가기 */}
             <TouchableOpacity style={ls.backBtn} onPress={onBack} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
@@ -154,8 +157,8 @@ export default function LoginScreen({ onBack, onResetPress, onFindIdPress, onSig
             <BottomLinks onResetPress={onResetPress} onFindIdPress={onFindIdPress} onSignupPress={onSignupPress} />
           </ScrollView>
         </KeyboardAvoidingView>
+        <AndroidBottomFill />
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 

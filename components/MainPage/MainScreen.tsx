@@ -3,6 +3,8 @@ import {
   Dimensions,
   Image,
   Platform,
+
+
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -10,13 +12,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import SearchScreen from '../SearchPage/SearchScreen';
-import MyScreen from '../MyPage/MyScreen';
-import LoginScreen from '../LoginPage/LoginScreen';
-import ResetPasswordScreen from '../ResetPasswordPage/ResetPasswordScreen';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import CartScreen from '../CartPage/CartScreen';
 import FindIdScreen from '../FindIdPage/FindIdScreen';
+import LoginScreen from '../LoginPage/LoginScreen';
+import MyScreen from '../MyPage/MyScreen';
+import PackageScreen from '../PackagePage/PackageScreen';
+import ProductDetailScreen from '../ProductDetailPage/ProductDetailScreen';
+import ResetPasswordScreen from '../ResetPasswordPage/ResetPasswordScreen';
+import ReviewScreen from '../ReviewPage/ReviewScreen';
+import SearchScreen from '../SearchPage/SearchScreen';
 import SignupScreen from '../SignupPage/SignupScreen';
+import AndroidBottomFill from '../common/AndroidBottomFill';
+
 
 const { width: SW } = Dimensions.get('window');
 const D = 393;
@@ -109,11 +117,11 @@ function TabBar({ tabs, active, onPress, pad = 0 }: {
   );
 }
 
-function CardGrid({ data }: { data: { title: string; venue: string }[] }) {
+function CardGrid({ data, onCardPress }: { data: { title: string; venue: string }[]; onCardPress?: () => void }) {
   return (
     <View style={st.grid}>
       {data.map((item, i) => (
-        <TouchableOpacity key={i} style={{ width: CARD_W, marginBottom: s(4) }}>
+        <TouchableOpacity key={i} style={{ width: CARD_W, marginBottom: s(4) }} onPress={onCardPress}>
           <GrayBox width={CARD_W} height={CARD_H} />
           <Text style={st.cardTitle} numberOfLines={1}>{item.title}</Text>
           <Text style={st.cardVenue} numberOfLines={1}>{item.venue}</Text>
@@ -125,7 +133,7 @@ function CardGrid({ data }: { data: { title: string; venue: string }[] }) {
 
 // ── 섹션 컴포넌트 ─────────────────────────────────────────────
 
-function StickyHeader({ isScrolled, onSearchPress }: { isScrolled: boolean; onSearchPress: () => void }) {
+function StickyHeader({ isScrolled, onSearchPress, onCartPress }: { isScrolled: boolean; onSearchPress: () => void; onCartPress: () => void }) {
   if (isScrolled) {
     return (
       <View style={st.stickyCompact}>
@@ -137,7 +145,7 @@ function StickyHeader({ isScrolled, onSearchPress }: { isScrolled: boolean; onSe
           />
           <Text style={st.searchPlaceholder}>당신의 뮤즈를 만나세요</Text>
         </TouchableOpacity>
-        <TouchableOpacity hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity onPress={onCartPress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Image
             source={require('../../assets/images/Home/shoppingcart.png')}
             style={st.cartIcon}
@@ -156,7 +164,7 @@ function StickyHeader({ isScrolled, onSearchPress }: { isScrolled: boolean; onSe
           style={[st.headerLogo, { tintColor: '#FFB3B3' }]}
           resizeMode="contain"
         />
-        <TouchableOpacity hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity onPress={onCartPress} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Image
             source={require('../../assets/images/Home/shoppingcart.png')}
             style={st.cartIcon}
@@ -231,7 +239,7 @@ function BannerCarousel() {
   );
 }
 
-function RankingSection() {
+function RankingSection({ onCardPress }: { onCardPress?: () => void }) {
   const [rankTab, setRankTab] = useState(0);
   return (
     <>
@@ -252,10 +260,10 @@ function RankingSection() {
         style={{ marginBottom: s(24) }}
       >
         {RANK_DATA.map((item, i) => (
-          <TouchableOpacity key={i} style={{ width: RANK_CARD_W }}>
+          <TouchableOpacity key={i} style={{ width: RANK_CARD_W }} onPress={onCardPress}>
             <View style={{ borderRadius: s(12), overflow: 'hidden' }}>
               <GrayBox width={RANK_CARD_W} height={RANK_CARD_H} radius={0} />
-              {[[-1,-1],[-1,0],[-1,1],[0,-1],[0,0],[0,1],[1,-1],[1,0],[1,1]].map(([dx,dy],idx) => (
+              {[[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 0], [0, 1], [1, -1], [1, 0], [1, 1]].map(([dx, dy], idx) => (
                 <Text key={idx} style={[st.rankNum, { left: s(6) + dx * s(1.5), bottom: dy * s(1.5) }]}>
                   {item.rank}
                 </Text>
@@ -271,11 +279,11 @@ function RankingSection() {
   );
 }
 
-function PartySection() {
+function PartySection({ onCardPress }: { onCardPress: () => void }) {
   return (
     <View style={st.section}>
       <SectionTitle text="파티 추천 콘텐츠" />
-      <CardGrid data={PARTY_DATA} />
+      <CardGrid data={PARTY_DATA} onCardPress={onCardPress} />
       <TouchableOpacity style={st.viewAllBtn}>
         <Text style={st.viewAllTxt}>뮤즈 파티 전체보기</Text>
       </TouchableOpacity>
@@ -283,13 +291,13 @@ function PartySection() {
   );
 }
 
-function DateSection() {
+function DateSection({ onCardPress }: { onCardPress: () => void }) {
   const [dateTab, setDateTab] = useState(0);
   return (
     <View style={st.section}>
       <SectionTitle text="데이트 코스" />
       <TabBar tabs={DATE_TABS} active={dateTab} onPress={setDateTab} />
-      <CardGrid data={DATE_DATA} />
+      <CardGrid data={DATE_DATA} onCardPress={onCardPress} />
     </View>
   );
 }
@@ -360,22 +368,18 @@ function Footer({ onScrollTop }: { onScrollTop: () => void }) {
 }
 
 const NAV_TABS = [
-  { label: '홈',   on: require('../../assets/images/Tabbar/homeon.png'),   off: require('../../assets/images/Tabbar/homeoff.png') },
+  { label: '홈', on: require('../../assets/images/Tabbar/homeon.png'), off: require('../../assets/images/Tabbar/homeoff.png') },
   { label: '검색', on: require('../../assets/images/Tabbar/research.png'), off: require('../../assets/images/Tabbar/research.png') },
-  { label: '패키지', on: require('../../assets/images/Tabbar/ppon.png'),   off: require('../../assets/images/Tabbar/pp.png') },
-  { label: '마이',  on: require('../../assets/images/Tabbar/myon.png'),    off: require('../../assets/images/Tabbar/myoff.png') },
+  { label: '패키지', on: require('../../assets/images/Tabbar/ppon.png'), off: require('../../assets/images/Tabbar/pp.png') },
+  { label: '마이', on: require('../../assets/images/Tabbar/myon.png'), off: require('../../assets/images/Tabbar/myoff.png') },
 ];
 
 function BottomNav({ active, onChange }: { active: number; onChange: (i: number) => void }) {
   const insets = useSafeAreaInsets();
   const isAndroid = Platform.OS === 'android';
 
-  // 갤럭시: 시스템 네비게이션 바 높이만큼 검은 블록이 채워야 하는 높이
-  const androidFillHeight = isAndroid ? Math.max(insets.bottom, s(20)) : 0;
-
   return (
     <View>
-      {/* 탭 아이콘 행 — 흰 배경 */}
       <View style={[st.navbar, { paddingBottom: isAndroid ? s(8) : insets.bottom || s(20) }]}>
         {NAV_TABS.map((n, i) => (
           <TouchableOpacity key={i} style={st.navItem} onPress={() => onChange(i)}>
@@ -384,9 +388,7 @@ function BottomNav({ active, onChange }: { active: number; onChange: (i: number)
           </TouchableOpacity>
         ))}
       </View>
-
-      {/* 갤럭시 전용: 홈버튼 영역을 덮는 검은 블록 */}
-      {isAndroid && <View style={[st.androidBottomFill, { height: androidFillHeight }]} />}
+      <AndroidBottomFill />
     </View>
   );
 }
@@ -400,8 +402,26 @@ export default function MainScreen() {
   const [showReset, setShowReset] = useState(false);
   const [showFindId, setShowFindId] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [showProductDetail, setShowProductDetail] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
 
+  if (showReview) {
+    return <ReviewScreen onBack={() => setShowReview(false)} />;
+  }
+  if (showProductDetail) {
+    return <ProductDetailScreen
+      onBack={() => setShowProductDetail(false)}
+      onHomePress={() => setShowProductDetail(false)}
+      onSearchPress={() => { setShowProductDetail(false); setActiveNav(1); }}
+      onCartPress={() => { setShowProductDetail(false); setShowCart(true); }}
+      onReviewPress={() => setShowReview(true)}
+    />;
+  }
+  if (showCart) {
+    return <CartScreen onBack={() => setShowCart(false)} />;
+  }
   if (showReset) {
     return <ResetPasswordScreen onBack={() => setShowReset(false)} />;
   }
@@ -433,6 +453,16 @@ export default function MainScreen() {
     );
   }
 
+  // 패키지 탭: PackageScreen으로 전환
+  if (activeNav === 2) {
+    return (
+      <PackageScreen
+        activeNav={activeNav}
+        onNavChange={setActiveNav}
+      />
+    );
+  }
+
   // 마이 탭: MyScreen으로 전환
   if (activeNav === 3) {
     return (
@@ -446,12 +476,11 @@ export default function MainScreen() {
   }
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={st.root} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={st.root} edges={['top', 'left', 'right']}>
         <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
         {/* ── 상단 고정 헤더 ── */}
-        <StickyHeader isScrolled={isScrolled} onSearchPress={() => setActiveNav(1)} />
+        <StickyHeader isScrolled={isScrolled} onSearchPress={() => setActiveNav(1)} onCartPress={() => setShowCart(true)} />
 
         <ScrollView
           ref={scrollRef}
@@ -465,16 +494,15 @@ export default function MainScreen() {
           <TopBanner />
           <MenuGrid />
           <BannerCarousel />
-          <RankingSection />
-          <PartySection />
-          <DateSection />
+          <RankingSection onCardPress={() => setShowProductDetail(true)} />
+          <PartySection onCardPress={() => setShowProductDetail(true)} />
+          <DateSection onCardPress={() => setShowProductDetail(true)} />
           <Footer onScrollTop={() => scrollRef.current?.scrollTo({ y: 0, animated: true })} />
         </ScrollView>
 
         <BottomNav active={activeNav} onChange={setActiveNav} />
 
       </SafeAreaView>
-    </SafeAreaProvider>
   );
 }
 
